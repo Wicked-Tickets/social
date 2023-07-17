@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up</title>
+  </head>
+  <body>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyDzz7BSXUMAtQiW-oqJzRHLfSSys3x8GDE",
+        authDomain: "admin-92f59.firebaseapp.com",
+        projectId: "admin-92f59",
+        storageBucket: "admin-92f59.appspot.com",
+        messagingSenderId: "846433924573",
+        appId: "1:846433924573:web:4eff45fbe4d8436251b234",
+        measurementId: "G-HK75PF3F42",
+      };
+      firebase.initializeApp(firebaseConfig);
+    </script>
+    <h1>Sign Up</h1>
+
+    <form id="sign-up-form">
+      <label for="email">Email:</label><br />
+      <input type="email" id="email" name="email" required /><br />
+
+      <label for="password">Password:</label><br />
+      <input type="password" id="password" name="password" required /><br />
+
+      <label for="username">Username:</label><br />
+      <input type="text" id="username" name="username" required /><br />
+
+      <label for="fullname">Full Name:</label><br />
+      <input type="text" id="fullname" name="fullname" required /><br />
+
+      <input type="submit" value="Sign Up" />
+    </form>
+
+    <script>
+      document
+        .getElementById("sign-up-form")
+        .addEventListener("submit", function (event) {
+          event.preventDefault(); // to prevent the form from being submitted normally
+
+          var email = document.getElementById("email").value;
+          var password = document.getElementById("password").value;
+          var username = document.getElementById("username").value;
+          var fullname = document.getElementById("fullname").value;
+
+          firebase
+            .auth()
+            .createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+              // Signed in
+              var user = userCredential.user;
+
+              // Save the user's profile into Firestore
+              firebase
+                .firestore()
+                .collection("users")
+                .doc(user.uid)
+                .set({
+                  username: username,
+                  fullname: fullname,
+                  email: email,
+                })
+                .then(() => {
+                  alert("User profile saved successfully!");
+                  // Redirect to the homepage
+                  window.location.href = "home.html";
+                })
+                .catch((error) => {
+                  console.error("Error writing user profile: ", error);
+                });
+            })
+            .catch((error) => {
+              var errorCode = error.code;
+              var errorMessage = error.message;
+              // Display error message to the user
+              alert(errorMessage);
+            });
+        });
+    </script>
+  </body>
+</html>

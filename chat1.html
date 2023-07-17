@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Chat Interface</title>
+  </head>
+  <body>
+    <div style="display: flex">
+      <!-- Chat selection view -->
+      <div style="flex: 1; border-right: 1px solid black; padding-right: 10px">
+        <h3>Select User:</h3>
+        <select id="userSelect">
+          <op
+          tion value="user1">User 1</option>
+          <option value="user2">User 2</option>
+        </select>
+        <h4>Recent Chats:</h4>
+        <button onclick="setActiveChat('user1')">User 1 - Preview...</button
+        ><br />
+        <button onclick="setActiveChat('user2')">User 2 - Preview...</button>
+      </div>
+
+      <!-- Chat interaction view -->
+      <div style="flex: 2; padding-left: 10px">
+        <h3 id="chatHeader">Chat with User 1</h3>
+        <div
+          id="messageContainer"
+          style="
+            border: 1px solid black;
+            height: 300px;
+            overflow-y: scroll;
+            padding: 5px;
+          "
+        ></div>
+        <input
+          type="text"
+          id="messageInput"
+          placeholder="Type your message..."
+        />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
+    <script>
+      const messageContainer = document.getElementById("messageContainer");
+      const userSelect = document.getElementById("userSelect");
+      const chatHeader = document.getElementById("chatHeader");
+      const messageInput = document.getElementById("messageInput");
+
+      function setActiveChat(user) {
+        chatHeader.innerText = `Chat with ${
+          user.charAt(0).toUpperCase() + user.slice(1)
+        }`;
+        messageContainer.innerHTML = "";
+      }
+
+      function sendMessage() {
+        const message = messageInput.value;
+        if (!message) return;
+
+        messageContainer.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+        messageInput.value = "";
+      }
+
+      userSelect.addEventListener("change", (event) => {
+        setActiveChat(event.target.value);
+      });
+    </script>
+  </body>
+</html>

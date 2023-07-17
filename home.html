@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyDzz7BSXUMAtQiW-oqJzRHLfSSys3x8GDE",
+        authDomain: "admin-92f59.firebaseapp.com",
+        projectId: "admin-92f59",
+        storageBucket: "admin-92f59.appspot.com",
+        messagingSenderId: "846433924573",
+        appId: "1:846433924573:web:4eff45fbe4d8436251b234",
+        measurementId: "G-HK75PF3F42",
+      };
+      firebase.initializeApp(firebaseConfig);
+    </script>
+  </head>
+  <body>
+    <script>
+      // Get the currently logged-in user
+      const db = firebase.firestore();
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          // User is signed in, see docs for a list of available properties
+          // https://firebase.google.com/docs/reference/js/v8/firebase.User
+          db.collection("users")
+            .doc(user.uid)
+            .get()
+            .then((doc) => {
+              if (doc.exists) {
+                const data = doc.data();
+
+                // Create the <h1> element
+                const h1 = document.createElement("h1");
+                h1.textContent = "Home";
+
+                // Create the <p> element with id "greeting"
+                const p = document.createElement("p");
+                p.id = "greeting";
+                p.textContent = `Hello ${data.fullname}`;
+
+                // Create the <button> element with id "logoutBtn"
+                const button = document.createElement("button");
+                button.id = "logoutBtn";
+                button.textContent = "Logout";
+
+                button.addEventListener("click", () => {
+                  firebase
+                    .auth()
+                    .signOut()
+                    .then(() => {
+                      console.log("User signed out.");
+                      window.location.href = "index.html"; // Redirect to index page after sign out
+                    })
+                    .catch((error) => {
+                      console.log("Sign out error: ", error);
+                    });
+                });
+
+                // Get the reference to the body element
+                const body = document.body;
+
+                // Append the elements to the body
+                body.appendChild(h1);
+                body.appendChild(p);
+                body.appendChild(button);
+
+                // Create a new <p> element
+                var newParagraph = document.createElement("p");
+
+                // Create a <ul> element for the list
+                var newList = document.createElement("ul");
+
+                // Create an array of link texts and URLs
+                var links = [
+                  { text: "My Communities", url: "/communities.html" },
+                  { text: "My Tickets", url: "/tickets.html" },
+                  { text: "Global Profile", url: "/global-profile.html" },
+                  { text: "Messages", url: "/messages.html" },
+                ];
+
+                // Iterate over the links array and create <li> elements with <a> tags
+                for (var i = 0; i < links.length; i++) {
+                  var listItem = document.createElement("li");
+                  var link = document.createElement("a");
+                  link.href = links[i].url; // Set the link's href attribute
+                  link.textContent = links[i].text; // Set the link's text
+                  listItem.appendChild(link); // Add the link to the <li> element
+                  newList.appendChild(listItem); // Add the <li> element to the <ul> element
+                }
+
+                // Add the <ul> element to the new <p> element
+                newParagraph.appendChild(newList);
+
+                // Add the new <p> element to the body
+                body.appendChild(newParagraph);
+              }
+            })
+            .catch((error) => {
+              console.log("Error getting user data: ", error);
+            });
+        } else {
+          // User is signed out
+          window.location.href = "index.html"; // Redirect to index page
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  </head>
+  <body>
+    <h1>All Communities</h1>
+    <div id="communities"></div>
+
+    <script>
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDzz7BSXUMAtQiW-oqJzRHLfSSys3x8GDE",
+        authDomain: "admin-92f59.firebaseapp.com",
+        projectId: "admin-92f59",
+        storageBucket: "admin-92f59.appspot.com",
+        messagingSenderId: "846433924573",
+        appId: "1:846433924573:web:4eff45fbe4d8436251b234",
+        measurementId: "G-HK75PF3F42",
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+
+      var db = firebase.firestore();
+      var storage = firebase.storage();
+
+      db.collection("communities")
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            var community = doc.data();
+
+            var storageRef = storage.ref();
+            var profileRef = storageRef.child(
+              "community_profiles/" + doc.id + ".png"
+            );
+
+            profileRef
+              .getDownloadURL()
+              .then(function (url) {
+                var img = document.createElement("img");
+                img.src = url;
+                img.alt = community.name;
+
+                var div = document.createElement("div");
+                var h2 = document.createElement("h2");
+                h2.textContent = community.name;
+
+                div.appendChild(h2);
+                div.appendChild(img);
+
+                document.getElementById("communities").appendChild(div);
+              })
+              .catch(function (error) {
+                console.log("Error getting profile picture: ", error);
+              });
+          });
+        })
+        .catch((error) => {
+          console.log("Error getting documents: ", error);
+        });
+    </script>
+  </body>
+</html>

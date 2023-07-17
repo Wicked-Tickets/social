@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat</title>
+    <style>
+      .conversation {
+        padding: 10px;
+        color: white;
+      }
+      .selected-conversation {
+        padding: 10px;
+        color: white;
+      }
+      .message {
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Chat</h1>
+    <div style="display: flex">
+      <div
+        style="flex-basis: 25%; background-color: blue; overflow: auto"
+        class="conversation"
+      >
+        <!-- Add a stacked UI for all past conversations -->
+        <div class="message">Past Conversation 1</div>
+        <div class="message">Past Conversation 2</div>
+        <div class="message">Past Conversation 3</div>
+        <!-- Add more as required -->
+      </div>
+      <div
+        style="background-color: green; flex-basis: 75%; overflow: auto"
+        class="selected-conversation"
+      >
+        <!-- Add UI for the selected conversation -->
+        <div class="message">Message 1 in the Selected Conversation</div>
+        <div class="message">Message 2 in the Selected Conversation</div>
+        <div class="message">Message 3 in the Selected Conversation</div>
+        <!-- Add more as required -->
+      </div>
+    </div>
+  </body>
+</html>

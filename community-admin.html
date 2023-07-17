@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin</title>
+  </head>
+  <body>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+    <h1 id="header-communities" style="display: none">Existing communities</h1>
+    <div id="communities"></div>
+
+    <h2 id="edit-form-title" style="display: none">Edit a community</h2>
+    <form id="edit-community-form" style="display: none">
+      <input type="text" id="edit-name" placeholder="Community name" />
+      <input type="text" id="edit-slug" placeholder="Community slug" />
+      <button type="submit">Save Changes</button>
+    </form>
+
+    <h2>Create a community</h2>
+    <form id="create-community-form">
+      <input type="text" id="name" placeholder="Community name" />
+      <input type="text" id="slug" placeholder="Community slug" />
+      <button type="submit">Create Community</button>
+    </form>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyDzz7BSXUMAtQiW-oqJzRHLfSSys3x8GDE",
+        authDomain: "admin-92f59.firebaseapp.com",
+        projectId: "admin-92f59",
+        storageBucket: "admin-92f59.appspot.com",
+        messagingSenderId: "846433924573",
+        appId: "1:846433924573:web:4eff45fbe4d8436251b234",
+        measurementId: "G-HK75PF3F42",
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      // Get the current user ID from Firebase Auth
+      let currentUserID = null;
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          currentUserID = user.uid;
+        }
+      });
+
+      // Load communities from Firestore
+      db.collection("communities").onSnapshot((snapshot) => {
+        const communitiesDiv = document.getElementById("communities");
+        communitiesDiv.innerHTML = ""; // clear the div
+
+        if (!snapshot.empty) {
+          document.getElementById("header-communities").style.display = "block";
+          snapshot.docs.forEach((doc) => {
+            const data = doc.data();
+
+            const communityDiv = document.createElement("div");
+            const nameElement = document.createElement("span");
+            const slugElement = document.createElement("span");
+            const ownerElement = document.createElement("span");
+
+            nameElement.textContent = `Name: ${data.fullname}`;
+            slugElement.textContent = `, Slug: ${data.slug}`;
+
+            // Get owner name based on owner ID
+            if (data.owner) {
+              db.collection("users")
+                .doc(data.owner)
+                .get()
+                .then((userDoc) => {
+                  const ownerData = userDoc.data();
+                  ownerElement.textContent = `, Owner: ${ownerData.fullname}`;
+                });
+            }
+
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete";
+            deleteButton.addEventListener("click", () => {
+              db.collection("communities").doc(doc.id).delete();
+            });
+
+            const editButton = document.createElement("button");
+            editButton.textContent = "Edit";
+            editButton.addEventListener("click", () => {
+              document.getElementById("edit-name").value = data.name;
+              document.getElementById("edit-slug").value = data.slug;
+              document.getElementById("edit-community-form").style.display =
+                "block";
+              document.getElementById("edit-form-title").style.display =
+                "block";
+              document.getElementById("edit-community-form").onsubmit = (e) => {
+                e.preventDefault();
+                db.collection("communities")
+                  .doc(doc.id)
+                  .update({
+                    name: document.getElementById("edit-name").value,
+                    slug: document.getElementById("edit-slug").value,
+                  });
+                document.getElementById("edit-community-form").style.display =
+                  "none";
+                document.getElementById("edit-form-title").style.display =
+                  "none";
+              };
+            });
+
+            communityDiv.appendChild(nameElement);
+            communityDiv.appendChild(slugElement);
+            communityDiv.appendChild(ownerElement);
+            communityDiv.appendChild(deleteButton);
+            communityDiv.appendChild(editButton);
+
+            communitiesDiv.appendChild(communityDiv);
+          });
+        } else {
+          document.getElementById("header-communities").style.display = "none";
+        }
+      });
+
+      // Create a new community
+      const form = document.getElementById("create-community-form");
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById("name").value;
+        const slug = document.getElementById("slug").value;
+
+        db.collection("communities")
+          .add({
+            name: name,
+            slug: slug,
+            owner: currentUserID, // Assign the current user ID as the owner
+          })
+          .then(() => {
+            // Reset the input fields
+            document.getElementById("name").value = "";
+            document.getElementById("slug").value = "";
+          })
+          .catch((error) => {
+            console.error("Error adding community:", error);
+          });
+      });
+    </script>
+  </body>
+</html>

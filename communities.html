@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My communities</title>
+  </head>
+  <body>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+    <h1>My Communities</h1>
+    <div id="communities"></div>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyDzz7BSXUMAtQiW-oqJzRHLfSSys3x8GDE",
+        authDomain: "admin-92f59.firebaseapp.com",
+        projectId: "admin-92f59",
+        storageBucket: "admin-92f59.appspot.com",
+        messagingSenderId: "846433924573",
+        appId: "1:846433924573:web:4eff45fbe4d8436251b234",
+        measurementId: "G-HK75PF3F42",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          db.collection("users")
+            .doc(user.uid)
+            .get()
+            .then((userDoc) => {
+              if (userDoc.exists) {
+                const userData = userDoc.data();
+                const communities = userData.communities;
+                communities.forEach((communityId) => {
+                  db.collection("communities")
+                    .doc(communityId)
+                    .get()
+                    .then((communityDoc) => {
+                      if (communityDoc.exists) {
+                        const communityData = communityDoc.data();
+                        const communityElement = document.createElement("p");
+                        const communityLink = document.createElement("a");
+                        communityLink.textContent = communityData.name;
+                        communityLink.href = `/communities/${communityData.slug}`;
+                        communityElement.appendChild(communityLink);
+                        document
+                          .getElementById("communities")
+                          .appendChild(communityElement);
+                      } else {
+                        console.log("No such community!");
+                      }
+                    })
+                    .catch((error) => {
+                      console.log("Error getting community:", error);
+                    });
+                });
+              } else {
+                console.log("No such user!");
+              }
+            })
+            .catch((error) => {
+              console.log("Error getting user:", error);
+            });
+        } else {
+          console.log("No user is signed in.");
+        }
+      });
+    </script>
+  </body>
+</html>
